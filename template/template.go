@@ -121,6 +121,10 @@ func (t *Template) Parse() (string, error) {
 	return string(contentBuffer), nil
 }
 
+func toTemplatePath(templateName string) string {
+	return filepath.FromSlash(strings.ReplaceAll(templateName, ".", "/"))
+}
+
 func getTemplatePath(templateName string) (string, error) {
 	basePath, err := utils.GetProjectRoot()
 
@@ -128,7 +132,7 @@ func getTemplatePath(templateName string) (string, error) {
 		return "", fmt.Errorf("couldn't find views resources folder")
 	}
 
-	fileName := strings.ReplaceAll(templateName, ".", "/") + TEMPLATE_EXTENSION
+	fileName := toTemplatePath(templateName) + TEMPLATE_EXTENSION
 	templatePath := filepath.Join(basePath, VIEW_RESOURCES_FOLDER, fileName)
 
 	if _, err := os.Stat(templatePath); err == nil {
