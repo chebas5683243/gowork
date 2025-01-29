@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const RESOURCES_FOLDER = "resources"
+const VIEW_RESOURCES_FOLDER = "resources/views"
 
 const TEMPLATE_EXTENSION = ".goplate.html"
 
@@ -125,11 +125,11 @@ func getTemplatePath(templateName string) (string, error) {
 	basePath, err := utils.GetProjectRoot()
 
 	if (err) != nil {
-		return "", fmt.Errorf("couldn't find resources folder")
+		return "", fmt.Errorf("couldn't find views resources folder")
 	}
 
-	fileName := templateName + TEMPLATE_EXTENSION
-	templatePath := filepath.Join(basePath, RESOURCES_FOLDER, fileName)
+	fileName := strings.ReplaceAll(templateName, ".", "/") + TEMPLATE_EXTENSION
+	templatePath := filepath.Join(basePath, VIEW_RESOURCES_FOLDER, fileName)
 
 	if _, err := os.Stat(templatePath); err == nil {
 		return templatePath, nil
