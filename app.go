@@ -2,16 +2,30 @@ package main
 
 import (
 	"fmt"
+	"local/router"
 	"local/template"
-	"log"
 	"net/http"
 )
 
 func serve() {
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("public"))))
+	myRouter := router.New()
 
-	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
+	groupRouter := myRouter.Prefix("nested").Prefix("well")
+
+	myRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("home boy"))
+	})
+
+	groupRouter.Get("/test", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok buddy"))
+	})
+
+	groupRouter.Get("/test-2", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok buddy 2"))
+	})
+
+	myRouter.Get("/bar", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 
 		queryParameters := r.URL.Query()
@@ -23,12 +37,15 @@ func serve() {
 		if err != nil {
 			fmt.Println(err)
 			fmt.Fprintf(w, "Problem loading the file")
+			return
 		}
 
 		fmt.Fprintf(w, "%s", view)
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	myRouter.Serve(router.RouterServeOptions{
+		PublicDir: false,
+	})
 }
 
 func main() {
